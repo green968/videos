@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Previewer with Input</title>
+</head>
+<body>
+
+    <label for="videoInput"><h3>Video Previewer</h3> </label>
+    <input type="text" id="videoInput" placeholder="Enter video filename..." size="30">
+    
+    <br><br>
+
+    <h3 id="typewriterTarget"></h3>
+
+    <video id="videoPlayer" controls width="350">
+        Your browser does not support the video tag.
+    </video>
+
+    <script>
+        // Cleaned up sample library keeping only the requested mp4 file
+        const samplevid = { 
+            "Im_innocent_video.mp4": "https://beans65785.github.io/videos/Im_innocent_video.mp4"
+        };
+        
+        // Get DOM elements
+        const player = document.getElementById("videoPlayer");
+        const typewriterTarget = document.getElementById("typewriterTarget");
+        const videoInput = document.getElementById("videoInput");
+
+        // Global variables to manage the typewriter state
+        let index = 0;
+        let timer = null;
+        let currentVideoName = "";
+
+        // Function to handle the typewriter effect
+        function typeWriter() {
+            if (index < currentVideoName.length) {
+                typewriterTarget.textContent += currentVideoName.charAt(index);
+                index++;
+                timer = setTimeout(typeWriter, 100); // Speed of typing in milliseconds
+            }
+        }
+
+        // Function to load a video and reset the typewriter
+        function loadVideo(fileName) {
+            // Clear any active typing animation
+            clearTimeout(timer);
+            typewriterTarget.textContent = "";
+            index = 0;
+
+            // Check if the file exists in our object library
+            if (samplevid[fileName]) {
+                currentVideoName = fileName;
+                player.src = samplevid[fileName];
+                typeWriter();
+            } else {
+                // Fallback text if the specific file typed isn't found
+                currentVideoName = "File not found inside samplevid object.";
+                player.src = "";
+                typeWriter();
+            }
+        }
+
+        // Listen for the "Enter" key press inside the text input box
+        videoInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                loadVideo(videoInput.value.trim());
+            }
+        });
+
+        // Initialize the app with the default first video on page load
+        window.onload = function() {
+            const defaultVideo = Object.keys(samplevid)[0];
+            videoInput.value = defaultVideo; // Populate input box with default
+            loadVideo(defaultVideo);
+        };
+    </script>
+
+</body>
+</html>
